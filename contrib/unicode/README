@@ -69,7 +69,7 @@ The procedure to update GCC's Unicode support is the following:
 	PropList.txt > ../../libcpp/ucnid.h
 
 7.  Read the corresponding Unicode's standard and update correspondingly
-    generated_ranges table in libcpp/makeuname2c.cc (in Unicode 17 all
+    generated_ranges table in libcpp/makeuname2c.cc (in Unicode 18 all
     the needed information was in Table 4-8).
 
 8.  Compile makeuname2c, e.g. with:
