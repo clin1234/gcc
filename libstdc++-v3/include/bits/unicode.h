@@ -891,6 +891,8 @@ inline namespace __v16_0_0
     {
       if (__is_incb_linker(__c))
 	_M_incb_linker_seen = true;
+      else if (__incb_property(__c) != _InCB::_Extend)
+        _M_incb_linker_seen = false;
     }
   };
 
@@ -961,13 +963,15 @@ inline namespace __v16_0_0
 		  auto __p = __grapheme_cluster_break_property(*__it);
 		  _M_update_xpicto_seq_state(__c, __p);
 		  _M_update_ri_count(__p);
-		  _M_update_incb_state(__c, __p);
+		  const bool __gb9c = _M_incb_linker_seen
+                   && __incb_property(__c) == _InCB::_Consonant;
 		  if (_M_is_break(__p_prev, __p, __it))
 		    {
 		      // Found a grapheme cluster break
 		      _M_reset(__c, __p);
 		      break;
 		    }
+                  _M_update_incb_state(__c, __p);
 		  __p_prev = __p;
 		}
 	      _M_base = __it;
@@ -1069,33 +1073,11 @@ inline namespace __v16_0_0
 	  if (__p1 == _Gcb_Prepend)
 	    return false; // or after Prepend characters.
 
-	  // Rule GB9c (Unicode 15.1.0)
-	  // Do not break within certain combinations with
-	  // Indic_Conjunct_Break (InCB)=Linker.
-	  if (_M_incb_linker_seen
-		&& __incb_property(_M_c) == _InCB::_Consonant
-		&& __incb_property(*__curr) == _InCB::_Consonant)
-	    {
-	      // Match [_M_base, __curr] against regular expression
-	      // Consonant ([Extend Linker]* Linker [Extend Linker]* Consonant)+
-	      bool __have_linker = false;
-	      auto __it = _M_base;
-	      while (++__it != __curr)
-		{
-		  if (__is_incb_linker(*__it))
-		    __have_linker = true;
-		  else
-		    {
-		      auto __incb = __incb_property(*__it);
-		      if (__incb == _InCB::_Consonant)
-			__have_linker = false;
-		      else if (__incb != _InCB::_Extend)
-			break;
-		    }
-		}
-	      if (__it == __curr && __have_linker)
-		return false;
-	    }
+	  // Rule GB9c (Unicode 18.0.0)
+          // \p{InCB=Linker} \p{InCB=Extend}* × \p{InCB=Consonant}
+          if (_M_incb_linker_seen
+            && __incb_property(*__curr) == _InCB::_Consonant)
+          return false;
 
 	  // Rule GB11
 	  // Do not break within emoji modifier sequences
