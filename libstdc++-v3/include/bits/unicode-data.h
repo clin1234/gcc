@@ -29,7 +29,7 @@
 
 #ifndef _GLIBCXX_GET_UNICODE_DATA
 # error "This is not a public header, do not include it directly"
-#elif _GLIBCXX_GET_UNICODE_DATA != 160000
+#elif _GLIBCXX_GET_UNICODE_DATA != 180000
 # error "Version mismatch for Unicode static data"
 #endif
 
